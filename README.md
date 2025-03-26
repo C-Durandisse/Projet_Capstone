@@ -1,9 +1,6 @@
 # Projet_Capstone
 Projet de certification google Data Analytic
 Étude de cas : Comment un service de vélos en libre-service peut-il réussir rapidement ?
-Introduction
-Bienvenue dans l'étude de cas sur l'analyse du partage de vélos Cyclistic ! Dans cette étude de cas, vous travaillez pour une entreprise fictive, Cyclistic, avec certains membres clés de l'équipe. Afin de répondre aux questions commerciales, suivez les étapes du processus d'analyse des données : demander, préparer, traiter, analyser, partager et agir. Tout au long du processus, les tableaux de la feuille de route de l'étude de cas, y compris les questions d'orientation et les tâches clés, vous aideront à rester sur la bonne voie.
-
 Scénario
 Vous êtes un analyste de données junior travaillant dans l'équipe d'analystes marketing de Cyclistic, une entreprise de partage de vélos à Chicago. Le directeur du marketing estime que le succès futur de l'entreprise dépend de la maximisation du nombre d'adhésions annuelles. Par conséquent, votre équipe souhaite comprendre comment les cyclistes occasionnels et les membres annuels utilisent les vélos Cyclistic différemment. À partir de ces informations, votre équipe concevra une nouvelle stratégie marketing pour convertir les cyclistes occasionnels en membres annuels. Mais d’abord, les dirigeants de Cyclistic doivent approuver vos recommandations, elles doivent donc être étayées par des informations convaincantes et des visualisations de données professionnelles.
 
@@ -26,11 +23,18 @@ Moreno s’est fixé un objectif clair : concevoir des stratégies marketing vis
 
 Questions directrices
 
-● Quelle est votre conclusion finale basée sur votre analyse ?
-● Comment votre équipe et votre entreprise pourraient-elles appliquer vos idées ?
-● Quelles sont les prochaines étapes que vous ou vos parties prenantes prendriez en fonction de vos conclusions ?
-● Existe-t-il des données supplémentaires que vous pourriez utiliser pour approfondir vos conclusions ?
+Trois questions guideront le futur programme de marketing :
+1. En quoi les membres annuels et les cyclistes occasionnels utilisent-ils différemment les vélos Cyclistic ?
+2. Pourquoi les cyclistes occasionnels achèteraient-ils des abonnements annuels Cyclistic ?
+3. Comment Cyclistic peut-il utiliser les médias numériques pour inciter les cyclistes occasionnels à devenir membres ?
+Moreno vous a assigné la première question à laquelle il faut répondre : Comment les membres annuels et les cyclistes occasionnels utilisent-ils les vélos Cyclistic ? les cyclistes utilisent-ils les vélos Cyclistic différemment ?
 
-Livrable 
 
-● Vos trois principales recommandations basées sur votre analyse
+Vous produirez un rapport avec les livrables suivants :
+1. Un énoncé clair de la tâche commerciale
+2. Une description de toutes les sources de données utilisées
+3. Documentation de tout nettoyage ou manipulation de données
+4. Un résumé de votre analyse
+5. Des visualisations et des conclusions clés à l'appui
+6. Vos trois principales recommandations basées sur votre analyse
+
