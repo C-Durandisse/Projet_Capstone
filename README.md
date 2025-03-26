@@ -31,22 +31,6 @@ Questions directrices
 ● Quelles sont les prochaines étapes que vous ou vos parties prenantes prendriez en fonction de vos conclusions ?
 ● Existe-t-il des données supplémentaires que vous pourriez utiliser pour approfondir vos conclusions ?
 
-Tâches principales
-
-● Créez votre portfolio.
-● Ajoutez votre étude de cas.
-● Entraînez-vous à présenter votre étude de cas à un ami ou à un membre de votre famille.
-
 Livrable 
 
 ● Vos trois principales recommandations basées sur votre analyse
-
-Suivez ces étapes :
-1. Si vous n'en avez pas déjà un, créez un portfolio en ligne.
-2. Réfléchissez à la manière dont vous souhaitez présenter votre étude de cas dans votre portfolio.
-3. Téléchargez ou liez les conclusions de votre étude de cas à votre portfolio.
-4. Rédigez un bref paragraphe décrivant l'étude de cas, votre processus et vos découvertes.
-5. Ajoutez le paragraphe pour présenter votre étude de cas dans votre portfolio.
-
-
-
