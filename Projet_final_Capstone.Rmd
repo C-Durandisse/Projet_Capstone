@@ -1,0 +1,1095 @@
+---
+title: "Projet Captosne sur les vélos à Chicago de l'entreprise Cyclistic"
+author: "Caleb Durandisse"
+date: "05/04/2025"
+output:
+    pdf_document:: 
+    css: www/my_style.css
+  ---
+**Entreprise** : Cyclistic
+
+**Produit** : Vélo en libre-service
+
+**Ville** : Chicago
+
+**Parties prenantes** : l’équipe d’analyse marketing, équipe de direction, 
+cyclistes occasionnels, membres annuels.
+
+L’entreprise crée en 2016, possède 5824 vélos géolocalisés et vérouillés 
+dans un réseau de 692 stations de service dans Chicago
+
+**Type de vélos** : 
+•	Vélos inclinables, 
+•	Tricycle à main, 
+•	Vélos cargo
+
+**Utilisateurs de vélos chez Cyclistics**
+•	Majorité optent pour des vélos traditionnels
+•	8% utilisent les options d’assistance
+•	30% utilisent le vélo pour se rendre au travail chaque jour
+
+**Stratégie actuelle pour son succès**
+•	Flexibilité des plans tarifaires
+o	Passes pour un trajet
+o	Passes pour une journée
+o	Adhésions annuelles
+
+**Type de clients** :
+•	Les cyclistes occasionnels sont : les clients qui achètent des passes 
+trajet et pour une journée.
+•	Les membre de Cyclistic : les clients qui achètent des adhésions annuelles
+
+*Contexte du projet* :
+Les experts ont déterminé que les adhérents réguliers sont beaucoup 
+plus rentables que les cyclistes occasionnels. La flexibilité des prix 
+encourage un aspect à attirer davantage les clients. 
+Ainsi, pour la directrice Moreno, l'optimisation du nombre d'adhérents annuels 
+sera le facteur déterminant de l'expansion future, plutôt que la mise en place 
+d'une campagne marketing visant à séduire de nouveaux clients. 
+D'après la directrice, une possibilité réside dans la transformation d
+es cyclistes occasionnels en adhérents. 
+
+ 	Il est à noter que les cyclistes occasionnels sont familiers avec 
+ 	le programme Cycllitic et l'ont sélectionné pour répondre à leurs 
+ 	exigences de mobilité. 
+
+
+1.*Énoncé clair de la tâche commerciale* :
+Déterminer les différences d'utilisation des vélos Cyclistic entre 
+les membres annuels et les cyclistes occasionnels afin d'éclairer 
+les stratégies marketing visant à convertir les cyclistes occasionnels 
+en membres annuels. Plus précisément, il s'agit d'analyser les données 
+de trajets pour identifier les tendances et les schémas d'utilisation 
+distincts entre ces deux groupes.
+
+*Pour atteindre l’objectif voici les questions auxquelles nous devrions 
+apporter des éléments de solution*
+1.	En quoi les cyclistes occasionnels et les membres annuels utilisent-ils 
+différemment les vélos Cyclistic ?
+2.	Pourquoi les cyclistes occasionnels achèteraient un abonnement ?
+3.	Comment Cyclistic peut-il utiliser les médias numériques pour inciter 
+les cyclistes occasionnels à devenir membres ?
+
+2. **Description des sources de données utilisées**:
+il s'agit de données historiques de Cyclistic sur les déplacements à vélo, 
+contenant les informations suivantes:
+•	Type d'utilisateur: (Membre annuel / Cycliste occasionnel)
+•	Date et heure de début et de fin du trajet: (Permettant de calculer la durée 
+du trajet)
+•	Station de départ et d'arrivée: (Permettant d'analyser les itinéraires et
+les zones populaires)
+•	Type de vélo utilisé: (Vélo standard, vélo inclinable, tricycle à main...)
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+### Installer les librairies
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(dplyr)
+library(skimr)
+library(janitor)
+library(ggplot2)
+```
+
+## Importer les fichiers dans R
+
+```{r}
+data_Q1_2019 <- read.csv("C:/Users/Utilisateur/Downloads/données_velo_certif_prof - Copie/Divvy_Trips_2019_Q1.csv")
+data_Q2_2019 <- read.csv("C:/Users/Utilisateur/Downloads/données_velo_certif_prof - Copie/Divvy_Trips_2019_Q2.csv")
+data_Q3_2019 <- read.csv("C:/Users/Utilisateur/Downloads/données_velo_certif_prof - Copie/Divvy_Trips_2019_Q3.csv")
+data_Q4_2019 <- read.csv("C:/Users/Utilisateur/Downloads/données_velo_certif_prof - Copie/Divvy_Trips_2019_Q4.csv")
+data_Q1_2020 <-read.csv("C:/Users/Utilisateur/Downloads/données_velo_certif_prof - Copie/Divvy_Trips_2020_Q1.csv")
+```
+
+# Nettoyage
+
+## Vérifier les noms des colonnes : {.tabset}
+
+### **Résultats**
+
+```{r, echo=FALSE}
+colnames(data_Q1_2019)
+colnames(data_Q2_2019)
+colnames(data_Q3_2019)
+colnames(data_Q4_2019)
+colnames(data_Q1_2020)
+```
+
+Les noms des variables pour le 2e trimestre 2019 diffèrent de ceux des autres 
+timestres. 
+
+Modifiez les noms des colonnes du fichier 2e trimestre 2019 et du 1er trimestre 
+2020 pour faciliter la fusion avec les autres trimestres️
+
+### **code** 
+```{r,eval=FALSE}
+colnames(data_Q1_2019)
+colnames(data_Q2_2019)
+colnames(data_Q3_2019)
+colnames(data_Q4_2019)
+colnames(data_Q1_2020)
+```
+
+## Changer les noms de colonnes du 2e trimestre 2019 : {.tabset}
+
+### **Résultats** 
+
+```{r,echo=FALSE}
+data_Q2_2019_v1 <- data_Q2_2019 %>%
+  rename(trip_id = X01...Rental.Details.Rental.ID,
+         start_time = X01...Rental.Details.Local.Start.Time,
+         end_time = X01...Rental.Details.Local.End.Time,
+         bikeid = X01...Rental.Details.Bike.ID,
+         tripduration = X01...Rental.Details.Duration.In.Seconds.Uncapped,
+         from_station_id = X03...Rental.Start.Station.ID,
+         from_station_name = X03...Rental.Start.Station.Name,
+         to_station_id = X02...Rental.End.Station.ID,
+         to_station_name = X02...Rental.End.Station.Name,
+         usertype = User.Type,
+         gender = Member.Gender,
+         birthyear = X05...Member.Details.Member.Birthday.Year) 
+str(data_Q2_2019_v1)
+```
+
+### **code** 
+```{r,eval=FALSE}
+data_Q2_2019_v1 <- data_Q2_2019 %>%
+  rename(trip_id = X01...Rental.Details.Rental.ID,
+         start_time = X01...Rental.Details.Local.Start.Time,
+         end_time = X01...Rental.Details.Local.End.Time,
+         bikeid = X01...Rental.Details.Bike.ID,
+         tripduration = X01...Rental.Details.Duration.In.Seconds.Uncapped,
+         from_station_id = X03...Rental.Start.Station.ID,
+         from_station_name = X03...Rental.Start.Station.Name,
+         to_station_id = X02...Rental.End.Station.ID,
+         to_station_name = X02...Rental.End.Station.Name,
+         usertype = User.Type,
+         gender = Member.Gender,
+         birthyear = X05...Member.Details.Member.Birthday.Year) 
+```
+
+## Changer les noms de colonnes du 1er trimestre 2020 : {.tabset}
+
+### **Résultats**  
+
+```{r, echo=FALSE}
+data_Q1_2020_v1 <-  data_Q1_2020  %>%
+  rename(trip_id = ride_id,
+         start_time = started_at,
+         end_time = ended_at,
+         from_station_id = start_station_id,
+         from_station_name = start_station_name,
+         to_station_id = end_station_id,
+         to_station_name = end_station_name,
+         usertype = member_casual)
+str(data_Q1_2020_v1)
+```
+
+### **Code** 
+```{r,eval=FALSE}
+data_Q1_2020_v1 <-  data_Q1_2020  %>%
+  rename(trip_id = ride_id,
+         start_time = started_at,
+         end_time = ended_at,
+         from_station_id = start_station_id,
+         from_station_name = start_station_name,
+         to_station_id = end_station_id,
+         to_station_name = end_station_name,
+         usertype = member_casual)
+```
+
+
+## visualiser les variables des 4 trimestres 2019 et ceux du 1er trimestre 2020: {.tabset}
+
+### **Résultats** 
+
+```{r, echo=FALSE}
+str(data_Q1_2020_v1)
+str(data_Q2_2019_v1)
+str(data_Q1_2019)
+str(data_Q3_2019)
+str(data_Q4_2019)
+```
+
+Ce récapitulatif nous indique que les formats des ID sont de type INT, 
+modifions donc ces formats ID (INT) en caractères.
+
+### **Code** 
+```{r, eval=FALSE}
+str(data_Q1_2020_v1)
+str(data_Q2_2019_v1)
+str(data_Q1_2019)
+str(data_Q3_2019)
+str(data_Q4_2019)
+```
+
+## Changer les formats ID (INT) en character : {.tabset}
+
+### **Résultats**
+
+```{r, echo=FALSE}
+data_Q1_2019$trip_id <- as.character(data_Q1_2019$trip_id)
+data_Q1_2019$bikeid <- as.character(data_Q1_2019$bikeid)
+data_Q1_2019$from_station_id <- as.character(data_Q1_2019$from_station_id)
+data_Q1_2019$to_station_id <- as.character(data_Q1_2019$to_station_id)
+
+data_Q3_2019$trip_id <- as.character(data_Q3_2019$trip_id)
+data_Q3_2019$bikeid <- as.character(data_Q3_2019$bikeid)
+data_Q3_2019$from_station_id <- as.character(data_Q3_2019$from_station_id)
+data_Q3_2019$to_station_id <- as.character(data_Q3_2019$to_station_id)
+
+data_Q4_2019$trip_id <- as.character(data_Q4_2019$trip_id)
+data_Q4_2019$bikeid <- as.character(data_Q4_2019$bikeid)
+data_Q4_2019$from_station_id <- as.character(data_Q4_2019$from_station_id)
+data_Q4_2019$to_station_id <- as.character(data_Q4_2019$to_station_id)
+
+data_Q2_2019_v1$trip_id <- as.character(data_Q2_2019_v1$trip_id)
+data_Q2_2019_v1$bikeid <- as.character(data_Q2_2019_v1$bikeid)
+data_Q2_2019_v1$from_station_id <- as.character(data_Q2_2019_v1$from_station_id)
+data_Q2_2019_v1$to_station_id <- as.character(data_Q2_2019_v1$to_station_id)
+
+data_Q1_2020_v1$from_station_id <- as.character(data_Q1_2020_v1$from_station_id)
+data_Q1_2020_v1$to_station_id <- as.character(data_Q1_2020_v1$to_station_id)
+```
+
+### **Code**
+```{r, eval=FALSE}
+data_Q1_2019$trip_id <- as.character(data_Q1_2019$trip_id)
+data_Q1_2019$bikeid <- as.character(data_Q1_2019$bikeid)
+data_Q1_2019$from_station_id <- as.character(data_Q1_2019$from_station_id)
+data_Q1_2019$to_station_id <- as.character(data_Q1_2019$to_station_id)
+
+data_Q3_2019$trip_id <- as.character(data_Q3_2019$trip_id)
+data_Q3_2019$bikeid <- as.character(data_Q3_2019$bikeid)
+data_Q3_2019$from_station_id <- as.character(data_Q3_2019$from_station_id)
+data_Q3_2019$to_station_id <- as.character(data_Q3_2019$to_station_id)
+
+data_Q4_2019$trip_id <- as.character(data_Q4_2019$trip_id)
+data_Q4_2019$bikeid <- as.character(data_Q4_2019$bikeid)
+data_Q4_2019$from_station_id <- as.character(data_Q4_2019$from_station_id)
+data_Q4_2019$to_station_id <- as.character(data_Q4_2019$to_station_id)
+
+data_Q2_2019_v1$trip_id <- as.character(data_Q2_2019_v1$trip_id)
+data_Q2_2019_v1$bikeid <- as.character(data_Q2_2019_v1$bikeid)
+data_Q2_2019_v1$from_station_id <- as.character(data_Q2_2019_v1$from_station_id)
+data_Q2_2019_v1$to_station_id <- as.character(data_Q2_2019_v1$to_station_id)
+
+data_Q1_2020_v1$from_station_id <- as.character(data_Q1_2020_v1$from_station_id)
+data_Q1_2020_v1$to_station_id <- as.character(data_Q1_2020_v1$to_station_id)
+```
+
+
+## Fusionner les trimestres de 2019 et celui de 2020 : {.tabset}
+
+### **Résultats**
+
+```{r, echo=FALSE}
+Data <- bind_rows(data_Q1_2019, data_Q2_2019_v1, data_Q3_2019,  data_Q4_2019, 
+                  data_Q1_2020_v1)
+head(Data, 5)
+```
+
+### **Code**
+```{r, eval=FALSE}
+Data <- bind_rows(data_Q1_2019, data_Q2_2019_v1, data_Q3_2019,  data_Q4_2019, 
+                  data_Q1_2020_v1)
+```
+
+## Résumé statistique du Dataframe : {.tabset}
+
+### **Résultats**
+
+```{r, echo=FALSE}
+summary(Data)
+```
+
+Les cellules vides dans les colonnes Birthyear, start_lat, start_lng, end_lat, 
+end_lng sont dues au fait qu'avant 2019, l'entreprise ne collectait pas 
+ces données auprès de ses clients. Ce n'est qu'à partir de 2020 qu'elle a 
+modifié sa politique concernant les informations à conserver dans la base 
+de données.
+
+### **Code**
+```{r, eval=FALSE}
+summary(Data)
+```
+
+## Modifier subscriber en member et customer en casual : {.tabset}
+
+### **Résultats**
+
+En 2019, l'entreprise désignait ses utilisateurs de vélo par les termes 
+« Subscriber » et « Customer ». En 2020, elle a modifié ces appellations 
+en « member » et « Casual ». Afin d'harmoniser les désignations de deux 
+observations dans le dataframe, nous allons remplacer tous les « subscriber » 
+par « member » et les « customer » par « casual ».
+
+```{r, echo=FALSE}
+data_v1 <- Data %>%
+  mutate(usertype = case_when(
+    usertype == "Subscriber" ~ "member",   
+    usertype == "Customer" ~ "casual",   
+    TRUE ~ usertype                            
+  ))
+```
+
+### **Code**
+```{r, eval=FALSE}
+data_v1 <- Data %>%
+  mutate(usertype = case_when(
+    usertype == "Subscriber" ~ "member",   
+    usertype == "Customer" ~ "casual",   
+    TRUE ~ usertype                            
+  ))
+```
+
+
+
+## Convertir le format Timestamp en format posixct : {.tabset}
+
+### **Résultats**
+```{r, echo=FALSE}
+data_v1$end_time <- as.POSIXct(data_v1$end_time, format = "%Y-%m-%d %H:%M:%S",
+                               tz= "UTC")
+data_v1$start_time <- as.POSIXct(data_v1$start_time, format = "%Y-%m-%d %H:%M:%S"
+                                 , tz= "UTC")
+```
+
+### **Code**
+```{r, eval=FALSE}
+data_v1$end_time <- as.POSIXct(data_v1$end_time, format = "%Y-%m-%d %H:%M:%S",
+                               tz= "UTC")
+data_v1$start_time <- as.POSIXct(data_v1$start_time, format = "%Y-%m-%d %H:%M:%S"
+                                 , tz= "UTC")
+```
+
+# Manipulation de données
+
+## Calculer la colonne "ride_length" : {.tabset}
+
+### **Résultats**
+```{r, echo=FALSE}
+data_v2 <- data_v1 %>%
+  mutate(ride_length = difftime(end_time, start_time, units = "secs")) %>%
+  mutate(ride_length = seconds_to_period(as.numeric(ride_length))) %>%
+  mutate(ride_length = sprintf("%02d:%02d:%02d",
+                               hour(ride_length),
+                               minute(ride_length),
+                               second(ride_length)))
+head(data_v2, 5)
+```
+
+### **Code**
+```{r,eval=FALSE}
+data_v2 <- data_v1 %>%
+  mutate(ride_length = difftime(end_time, start_time, units = "secs")) %>%
+  mutate(ride_length = seconds_to_period(as.numeric(ride_length))) %>%
+  mutate(ride_length = sprintf("%02d:%02d:%02d",
+                               hour(ride_length),
+                               minute(ride_length),
+                               second(ride_length)))
+```
+
+## Calculer la durée du trajet en secondes "durée_sec" : {.tabset}
+
+### **Résultats**
+```{r, echo=FALSE}
+data_v2 <- data_v2 %>%
+  mutate(duration_sec = as.numeric(difftime(end_time, start_time, units = 
+                                              "secs")))
+
+head(data_v2, 5)
+```
+
+### **Code**
+```{r,eval=FALSE}
+data_v2 <- data_v2 %>%
+  mutate(duration_sec = as.numeric(difftime(end_time, start_time, units = 
+                                              "secs")))
+```
+
+
+## Filtrer les durées de trajet inférieures à 120 secondes : {.tabset}
+
+### **Résultats**  
+
+Puisque les trajets de moins de 120 secondes sont peu probables pour des 
+déplacements en vélo, je les considère comme des anomalies. 
+ Je présume que les utilisateurs préfèrent le vélo pour des parcours plus longs.
+
+```{r, echo=FALSE}
+data_v2_filtre <- subset(data_v2, duration_sec < 120)
+
+head(data_v2_filtre,5)
+```
+
+### **Code**
+```{r, eval=FALSE}
+data_v2_filtre <- subset(data_v2, duration_sec < 120)
+```
+
+## Supprimer les durées de trajet inférieures à 120 secondes : {.tabset}
+
+### **Résultats** 
+
+```{r, echo=FALSE}
+data_v3 <- subset(data_v2, duration_sec > 120)
+
+head(data_v3, 5)
+```
+
+### **Code**
+```{r, eval=FALSE}
+data_v3 <- subset(data_v2, duration_sec > 120)
+```
+
+**Filtrer les durées de trajets trop longues**
+
+## Filtrer les durées de trajet supérieures à 10800 secondes : {.tabset}
+
+### **Résultats**
+
+Ainsi, je pense que les trajets dont la durée dépasse 3 heures ou 10 800 
+secondes sont des anomalies. 
+Un utilisateur moyen d'un service de localisation de vélos en libre-service ne 
+ferait probablement pas des trajets de cette longueur.  
+Je présume que ces durées sont le résultat d'erreurs dans les données, 
+de problèmes techniques ou d'une utilisation non conventionnelle du service.
+
+```{r, echo=FALSE}
+data_v4_filtre <- subset(data_v3, duration_sec > 10800)
+
+head(data_v4_filtre, 5)
+```
+
+### **Code**
+```{r,eval=FALSE}
+data_v4_filtre <- subset(data_v3, duration_sec > 10800)
+```
+
+## Supprimer les durées de trajet supérieures à 10800 secondes : {.tabset}
+
+### **Résultats**
+```{r,echo=FALSE}
+data_v4 <- subset(data_v3, duration_sec < 10800)
+
+head(data_v4, 5)
+```
+
+### **Code**
+```{r,eval=FALSE}
+data_v4 <- subset(data_v3, duration_sec < 10800)
+```
+
+## Trie croissant sur la durée de trajet : {.tabset}
+
+### **Résultats**
+```{r,echo=FALSE}
+data_v4 <- data_v4 %>%
+  arrange(duration_sec)
+
+head(data_v4, 10)
+
+tail(data_v4, 10)
+```
+
+### **Code**
+```{r,eval=FALSE}
+data_v4 <- data_v4 %>%
+  arrange(duration_sec)
+```
+
+## Compter les cellules vides par variables : {.tabset}
+
+### **Résultats**
+
+Comme indiqué précédemment, en ce qui concerne les variables comportant 
+un grand nombre de cellules vides, cela pourrait être lié à la nature 
+des données recueillies en 2019. De plus, en 2020, d'autres variables 
+ont été ajoutées.
+
+
+```{r,echo=FALSE}
+colSums(is.na(data_v4))
+```
+
+### **Code**
+```{r,eval=FALSE}
+colSums(is.na(data_v4))
+```
+
+## Calculer la colonne jour de la semaine à chaque début de trajet : {.tabset}
+
+### **Résultats**
+```{r, echo=FALSE}
+data_v4<- data_v4 %>%
+  mutate(day_of_week = wday(start_time,label=TRUE, abbr = FALSE, week_start=1))
+
+head(data_v4, 5)
+```
+
+### **Code**
+```{r, eval=FALSE}
+data_v4<- data_v4 %>%
+  mutate(day_of_week = wday(start_time,label=TRUE, abbr = FALSE, week_start=1))
+```
+
+## Calculer la colonne mois pour chaque début de trajet : {.tabset}
+
+### **Résultats**
+```{r,echo=FALSE}
+data_v4 <- data_v4 %>%
+  mutate(month = month(start_time, label = TRUE, abbr = FALSE))
+
+head(data_v4, 5)
+```
+
+### **Code**
+```{r,eval=FALSE}
+data_v4 <- data_v4 %>%
+  mutate(month = month(start_time, label = TRUE, abbr = FALSE))
+```
+
+## Calculer la colonne saison pour chaque début de trajet : {.tabset}
+
+### **Résultats**
+```{r,echo=FALSE}
+data_v4 <- data_v4 %>%
+  mutate(season = case_when(
+    month(start_time) %in% c(12, 1, 2) ~ "Hiver",
+    month(start_time) %in% c(3, 4, 5) ~ "Printemps",
+    month(start_time) %in% c(6, 7, 8) ~ "Été",
+    month(start_time) %in% c(9, 10, 11) ~ "Automne"
+  ))
+
+head(data_v4,5)
+```
+
+### **Code**
+```{r,eval=FALSE}
+data_v4 <- data_v4 %>%
+  mutate(season = case_when(
+    month(start_time) %in% c(12, 1, 2) ~ "Hiver",
+    month(start_time) %in% c(3, 4, 5) ~ "Printemps",
+    month(start_time) %in% c(6, 7, 8) ~ "Été",
+    month(start_time) %in% c(9, 10, 11) ~ "Automne"
+  ))
+```
+
+
+## Résumé statistique descriptive du dataset : {.tabset}
+
+### **Résultats**
+```{r,echo=FALSE}
+summary(data_v4)
+
+skim(data_v4)
+
+resultat_data_v4 <- data_v4 %>%
+  group_by(usertype) %>%
+  count()
+print(resultat_data_v4)
+```
+
+### **Code**
+```{r,eval=FALSE}
+summary(data_v4)
+
+skim(data_v4)
+
+resultat_data_v4 <- data_v4 %>%
+  group_by(usertype) %>%
+  count()
+```
+
+
+# Analyse
+
+## Comparer la durée moyenne de trajet, la durée max, l'écart-type  : {.tabset}
+
+### **Résultats**
+
+Les durées minimales et maximales sont quasiment identiques car j'ai défini 
+une durée minimale de 120 secondes pour qu'un utilisateur puisse emprunter 
+un vélo, et une durée maximale de 10800 secondes.
+
+ Le temps moyen de voyage est supérieur chez les clients ponctuels comparés 
+ aux membres, atteignant 2111 secondes contre 751 secondes.  Cette tendance 
+ ne représente pas fidèlement la réalité, car l'écart entre ces deux ensembles 
+ est trop significatif.
+
+
+```{r, echo=FALSE}
+summary_stats <- data_v4 %>%
+  group_by(usertype) %>%
+  summarise(
+    avg_duration = mean(duration_sec),
+    max_duration = max(duration_sec),
+    min_duration = min(duration_sec),
+    sd_duration = sd(duration_sec),
+    variance_duration = var(duration_sec),
+    total_rides = n()
+  )
+
+print(summary_stats)
+```
+
+### **Code**
+```{r, eval=FALSE}
+summary_stats <- data_v4 %>%
+  group_by(usertype) %>%
+  summarise(
+    avg_duration = mean(duration_sec),
+    max_duration = max(duration_sec),
+    min_duration = min(duration_sec),
+    sd_duration = sd(duration_sec),
+    variance_duration = var(duration_sec),
+    total_rides = n()
+  )
+```
+
+## Comparer la durée moyenne de trajet par jour et par type d'utilisateur  : {.tabset}
+
+### **Résultats**
+
+Les trajets des utilisateurs sont généralement plus longs particulièrement 
+le samedi et le dimanche, en comparaison avec les autres jours de la semaine, .
+
+
+```{r, echo=FALSE}
+weekly_stats <- data_v4 %>%
+  group_by(usertype, day_of_week) %>%
+  summarise(
+    avg_duration = mean(duration_sec),
+    max_duration = max(duration_sec),
+    min_duration = min(duration_sec),
+    sd_duration = sd(duration_sec),
+    variance_duration = var(duration_sec),
+    total_rides = n()
+  ) %>%
+  arrange(usertype, day_of_week)
+
+print(weekly_stats)
+```
+
+### **Code**
+```{r, eval=FALSE}
+weekly_stats <- data_v4 %>%
+  group_by(usertype, day_of_week) %>%
+  summarise(
+    avg_duration = mean(duration_sec),
+    max_duration = max(duration_sec),
+    min_duration = min(duration_sec),
+    sd_duration = sd(duration_sec),
+    variance_duration = var(duration_sec),
+    total_rides = n()
+  ) %>%
+  arrange(usertype, day_of_week)
+```
+
+## Comparer le nombre de trajets par station de départ et par type d'utilisateurs  : {.tabset}
+
+### **Résultats**
+
+Les dix stations les moins fréquentées sont principalement utilisées par 
+les usagers occasionnels, tandis que celles ayant le plus de visites sont 
+empruntées par les membres.
+
+```{r,echo=FALSE}
+station_stats <- data_v4 %>%
+  group_by(from_station_name, usertype) %>%
+  summarise(total_rides = n()) %>%
+  arrange(total_rides)
+
+print(station_stats)
+
+tail(station_stats, 10)
+```
+
+### **Code**
+```{r,eval=FALSE}
+station_stats <- data_v4 %>%
+  group_by(from_station_name, usertype) %>%
+  summarise(total_rides = n()) %>%
+  arrange(total_rides)
+```
+
+## Comparer la durée moyenne par saison et par type d'utilisateur : {.tabset}
+
+### **Résultats**
+
+Durant l'été, la durée moyenne des déplacements s'accumule pour les deux 
+catégories d' usagers.
+
+```{r, echo=FALSE}
+season_usertype <- data_v4 %>%
+  group_by(season, usertype) %>%
+  summarize(mean_ride_length = mean(duration_sec),
+            max_duration = max(duration_sec),
+            min_duration = min(duration_sec),
+            sd_duration = sd(duration_sec),
+            variance_duration = var(duration_sec),
+            total_rides = n()
+  ) %>%
+  arrange(usertype, season)
+
+print(season_usertype)
+```
+
+### **Code**
+```{r,eval=FALSE}
+season_usertype <- data_v4 %>%
+  group_by(season, usertype) %>%
+  summarize(mean_ride_length = mean(duration_sec),
+            max_duration = max(duration_sec),
+            min_duration = min(duration_sec),
+            sd_duration = sd(duration_sec),
+            variance_duration = var(duration_sec),
+            total_rides = n()
+  ) %>%
+  arrange(usertype, season)
+```
+
+
+## Comparer la durée moyenne par mois et par type d'utilisateur  : {.tabset}
+
+### **Résultats**
+
+```{r, echo=FALSE}
+month_usertype <- data_v4 %>%
+  group_by(month, usertype) %>%
+  summarize(mean_ride_length = mean(duration_sec),
+            max_duration = max(duration_sec),
+            min_duration = min(duration_sec),
+            sd_duration = sd(duration_sec),
+            variance_duration = var(duration_sec),
+            total_rides = n()
+  ) %>%
+  arrange(usertype, month)
+
+print(month_usertype)
+```
+
+### **Code**
+```{r, eval=FALSE}
+month_usertype <- data_v4 %>%
+  group_by(month, usertype) %>%
+  summarize(mean_ride_length = mean(duration_sec),
+            max_duration = max(duration_sec),
+            min_duration = min(duration_sec),
+            sd_duration = sd(duration_sec),
+            variance_duration = var(duration_sec),
+            total_rides = n()
+  ) %>%
+  arrange(usertype, month)
+```
+
+
+# Visualiser les tendances
+
+## Répartition des trajets par type d'utilisateur  : {.tabset}
+
+### **Résultats**
+
+Le nombre de « membres » dépasse largement celui des « clients occasionnels », 
+et ce graphique illustre que les membres effectuent plus de déplacements que 
+les clients occasionnels, ce qui est tout à fait compréhensible.
+
+```{r, echo=FALSE}
+ggplot(data_v4, aes(x = usertype, fill = usertype)) +
+  geom_bar(position = "dodge", stat = "count") +
+  labs(
+    title = "Répartition des trajets par type d'utilisateur",
+    x = "Type d'utilisateur",
+    y = "Nombre total de trajets")
+```
+
+### **Code**
+```{r,eval=FALSE}
+ggplot(data_v4, aes(x = usertype, fill = usertype)) +
+  geom_bar(position = "dodge", stat = "count") +
+  labs(
+    title = "Répartition des trajets par type d'utilisateur",
+    x = "Type d'utilisateur",
+    y = "Nombre total de trajets")
+```
+
+
+## visualiser les Durées moyennes des trajets par jour de la semaine : {.tabset}
+
+### **Résultats**
+
+Les durées de voyages atteignent leur maximum les samedis et dimanches.
+Il est possible que la durée moyenne de déplacement des clients occasionnels 
+soit plus longue que celle des membres. Il faut noter que le groupe « membre » 
+est bien plus grand que celui des clients occasionnels. Dans cette optique, 
+des tests statistiques nous aideront à confirmer ou à infirmer cette supposition.
+
+```{r,echo=FALSE}
+ggplot(weekly_stats, aes(x = day_of_week, y = avg_duration, fill = usertype)) +
+  geom_col(position = "dodge") +
+  labs(title = "Durée moyenne des trajets par jour de la semaine",
+       x = "Jour de la semaine", y = "Durée moyenne (sec)",
+       fill = "Type d'utilisateur")
+```
+
+### **Code**
+```{r,eval=FALSE}
+ggplot(weekly_stats, aes(x = day_of_week, y = avg_duration, fill = usertype)) +
+  geom_col(position = "dodge") +
+  labs(title = "Durée moyenne des trajets par jour de la semaine",
+       x = "Jour de la semaine", y = "Durée moyenne (sec)",
+       fill = "Type d'utilisateur")
+```
+
+## visualiser le Nombre total de trajets par jour de la semaine : {.tabset}
+
+### **Résultats**
+
+Selon le comptage du nombre de trajets, les membres utilisent davantage le vélo 
+que les clients occasionnels. Cependant, l'estimation de la durée moyenne 
+des trajets indique que les clients occasionnels roulent plus souvent 
+à vélo que les membres.
+
+Par ailleurs, chez les membres, on constate une utilisation importante 
+du vélo du lundi au vendredi, ce qui est en opposition avec le comportement 
+des clients occasionnels. En revanche, durant le week-end, l'usage du vélo 
+diminue chez les membres et s'accroît chez les clients occasionnels.
+
+```{r, echo=FALSE}
+ggplot(weekly_stats, aes(x = day_of_week, y = total_rides, fill = usertype)) +
+  geom_col(position = "dodge") +
+  labs(title = "Nombre total de trajets par jour de la semaine",
+       x = "Jour de la semaine", y = "Nombre total de trajets",
+       fill = "Type d'utilisateur")
+```
+
+### **Code**
+```{r, eval=FALSE}
+ggplot(weekly_stats, aes(x = day_of_week, y = total_rides, fill = usertype)) +
+  geom_col(position = "dodge") +
+  labs(title = "Nombre total de trajets par jour de la semaine",
+       x = "Jour de la semaine", y = "Nombre total de trajets",
+       fill = "Type d'utilisateur")
+```
+
+## visualiser les durées de trajets par saisons et type d'utilisateur : {.tabset}
+
+### **Résultats**
+
+Durant l'été, les utilisateurs ont tendance à opter pour le vélo afin de 
+profiter du soleil. Durant l'hiver, on constate une diminution significative 
+du nombre de trajets pendant cette saison.
+
+
+```{r, echo=FALSE}
+ggplot(data_v4, aes(x = season, fill = usertype)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Nombre de trajets par saison et type d'utilisateur", 
+       x = "Saison", y = "Nombre de trajets")
+```
+
+### **Code**
+```{r, eval=FALSE}
+ggplot(data_v4, aes(x = season, fill = usertype)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Nombre de trajets par saison et type d'utilisateur", 
+       x = "Saison", y = "Nombre de trajets")
+```
+
+## Visualiser les nombres de trajet par mois : {.tabset}
+
+### **Résultats**
+
+On observe une augmentation de l'utilisation des vélos pendant les mois d'été, 
+suivie d'une diminution pendant les mois d'hiver.
+
+```{r,echo=FALSE}
+ggplot(data_v4, aes(x = month, fill = usertype)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Nombre de trajets par mois et type d'utilisateur",
+       x = "month", y = "Nombre de trajets")
+```
+
+### **Code**
+```{r, eval=FALSE}
+ggplot(data_v4, aes(x = month, fill = usertype)) +
+  geom_bar(position = "dodge") +
+  labs(title = "Nombre de trajets par mois et type d'utilisateur",
+       x = "month", y = "Nombre de trajets")
+```
+
+
+# Comparer les moyennes
+
+La différence considérable entre le groupe « membre » et celui du 
+« client occasionnel » nous offre la possibilité d'effectuer des tests 
+statistiques pour confirmer ou infirmer les hypothèses. 
+
+# Vérifier la distribution des durées
+
+## Séparer les groupes : {.tabset}
+
+### **Résultats**
+```{r, echo=FALSE}
+abonnes <- data_v4 %>% filter(usertype == "member") %>% pull(duration_sec)
+non_abonnes <- data_v4 %>% filter(usertype == "casual") %>% pull(duration_sec)
+
+head(abonnes)
+head(non_abonnes)
+```
+
+### **Code**
+```{r,eval=FALSE}
+abonnes <- data_v4 %>% filter(usertype == "member") %>% pull(duration_sec)
+non_abonnes <- data_v4 %>% filter(usertype == "casual") %>% pull(duration_sec)
+```
+
+## Test de Shapiro-Wilk pour la normalité
+## n Pour rendre l'échantillonnage reproductible
+
+Le test de Shapiro-Wilk est un test statistique puissant utilisé pour évaluer 
+si un échantillon de données provient d'une distribution normale
+
+H0 : Les données suivent une distribution normale.
+H1 : Les données ne suivent pas une distribution normale
+
+Effectuons un échantillonnage aléatoire pour examiner la normalité 
+des deux groupes, en considérant « member » comme abonné et « casual » 
+comme non abonné, avec n inférieur ou égal à 5000.
+
+
+### Test de Shapiro-Wilk pour la normalité : {.tabset}
+
+#### **Résultats**
+
+*abonnes* :
+W = 0.79716
+p-value < 2.2e-16 (très faible)
+La valeur p est extrêmement faible (beaucoup moins que 0,05). Cela signifie 
+qu'il est extrêmement improbable que les données des abonnés proviennent d'une 
+distribution normale.
+
+Nous rejetons l'hypothèse nulle, les données des abonnées ne suivent pas
+une distribution normale.
+
+*non_abonnes* :
+W = 0.79865
+p-value < 2.2e-16 (très faible)
+De même, la valeur p est extrêmement faible. Cela indique que les données 
+des non-abonnés ne sont pas normalement distribuées.
+Nous rejettons l'hypothèse nulle, les données des non abonnées ne suivent 
+pas une distribution normale.
+
+**Conclusions importantes**
+
+*Non-normalité* :
+Les deux échantillons, abonnés et non-abonnés, montrent une déviation 
+significative de la normalité.
+
+```{r, echo=FALSE}
+set.seed(123) 
+sample_abonnes <- sample(abonnes, size = 5000)
+sample_non_abonnes <- sample(non_abonnes, size = 5000)
+
+shapiro.test(sample_abonnes)
+shapiro.test(sample_non_abonnes)
+```
+
+#### **Code**
+```{r,eval=FALSE}
+set.seed(123) 
+sample_abonnes <- sample(abonnes, size = 5000)
+sample_non_abonnes <- sample(non_abonnes, size = 5000)
+```
+
+## Visualisation avec un histogramme, ajuster la plage (exemple : 0 à 10800 s : {.tabset}
+
+### **Résultats**
+
+Pour compléter le test de Shapiro-Wilk, effectuons un histogramme.  
+Ce diagramme en barres illustre bien que la distribution n'est pas normale. 
+
+```{r, echo=FALSE}
+ggplot(data_v4, aes(x = duration_sec, fill = usertype)) +
+  geom_histogram(alpha = 0.6, bins = 50, position = "identity") +
+  coord_cartesian(xlim = c(0, 10800)) +
+  theme_minimal()
+```
+
+### **Code**
+```{r, eval=FALSE}
+ggplot(data_v4, aes(x = duration_sec, fill = usertype)) +
+  geom_histogram(alpha = 0.6, bins = 50, position = "identity") +
+  coord_cartesian(xlim = c(0, 10800)) +
+  theme_minimal()
+```
+
+## Les données ne sont pas normales → Test de Mann-Whitney (Wilcoxon) : {.tabset}
+
+### **Résultats**
+
+Notre dataset ne suit pas une distribution normale, vérifions leurs différence 
+significative entre les membres et les clients occasionnels.
+
+H0 : Il n'y a pas de différence significative entre les abonnes et non_abonnes.
+H1 : Il existe une différence significative entre les abonnes et non_abonnes.
+
+```{r,echo=FALSE}
+wilcox_test <- wilcox.test(abonnes, non_abonnes)
+print(wilcox_test)
+```
+
+### **Code**
+```{r,eval=FALSE}
+wilcox_test <- wilcox.test(abonnes, non_abonnes)
+```
+
+
+# Analyse
+
+**W = 5.4745e+11 :**
+Cette valeur représente la statistique de test de Wilcoxon. C'est une valeur 
+très élevée, ce qui suggère une différence significative entre les groupes.
+
+**p-value < 2.2e-16 :**
+La valeur p est extrêmement faible (beaucoup moins que 0,05). Cela signifie 
+qu'il est extrêmement improbable d'obtenir ces résultats si les durées de 
+trajet des abonnés et des non-abonnés étaient similaires.
+Nous rejetons l'hypothèse nulle.
+
+**alternative hypothese :**
+Cela indique que le test a été effectué pour déterminer si les groupes 
+sont différents (test bilatéral). Le résultat confirme qu'il existe 
+une différence significative dans la localisation (médiane) des durées 
+de trajet entre les abonnés et les non-abonnés.
+
+## Conclusions importantes
+
+*Différence significative* :
+Il existe une différence statistiquement significative dans les durées 
+de trajet entre les abonnés et les non-abonnés.
+
+**Non-normalité** :
+Ce test a été utilisé car les données ne sont pas normalement distribuées, 
+comme confirmé par le test de Shapiro-Wilk précédent.
+
+
+**Trois principales recommandations** :
+
+•	*Recommandation 1*: Cibler les cyclistes occasionnels qui utilisent les vélos 
+pendant les heures de pointe en semaine avec des offres d'abonnement axées sur 
+les déplacements domicile-travail.
+
+•	*Recommandation 2*: Promouvoir les abonnements annuels auprès des cyclistes 
+occasionnels qui effectuent des trajets plus longs, en mettant en avant 
+les avantages économiques à long terme.
+
+•	*Recommandation 3*: Offrir des essais gratuits ou des réductions sur 
+les abonnements annuels aux cyclistes occasionnels qui utilisent fréquemment 
+les vélos pendant les week-ends, afin de les inciter à adopter un usage plus 
+régulier.
+
